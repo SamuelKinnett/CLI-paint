@@ -1,0 +1,6 @@
+C:\Users\Samuel\Documents\GitHub\CLI-paint\CLI-paint\bin\Debug\CLI-paint.exe.config
+C:\Users\Samuel\Documents\GitHub\CLI-paint\CLI-paint\bin\Debug\CLI-paint.exe
+C:\Users\Samuel\Documents\GitHub\CLI-paint\CLI-paint\bin\Debug\CLI-paint.pdb
+C:\Users\Samuel\Documents\GitHub\CLI-paint\CLI-paint\obj\Debug\CLI-paint.csprojResolveAssemblyReference.cache
+C:\Users\Samuel\Documents\GitHub\CLI-paint\CLI-paint\obj\Debug\CLI-paint.exe
+C:\Users\Samuel\Documents\GitHub\CLI-paint\CLI-paint\obj\Debug\CLI-paint.pdb
