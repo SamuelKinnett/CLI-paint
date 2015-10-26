@@ -53,8 +53,15 @@ namespace CLI_paint
                 }
             }
 
-            Console.WindowWidth = width + 20;
-            Console.WindowHeight = height + 4;
+            //Ensure the console window is never too small
+            if (width > 60)
+                Console.WindowWidth = width + 20;
+            else
+                Console.WindowWidth = 80;
+            if (height > 21)
+                Console.WindowHeight = height + 4;
+            else
+                Console.WindowWidth = 25;
 
             Console.Clear();
             DrawPaintGUI(name, width, height);
@@ -66,27 +73,11 @@ namespace CLI_paint
             int currentShading = 1;
 
             UpdatePaintGUI(currentForeColour, currentBackColour, currentShading);
-            //Write the current X and Y values of the cursor to the title bar, to aid in drawing (hopefully)
-            Console.SetCursorPosition(Console.WindowWidth - 28, 0);
-            Console.Write("     ");
-            Console.SetCursorPosition(Console.WindowWidth - 28, 0);
-            Console.Write("X: " + cursorX);
-            Console.SetCursorPosition(Console.WindowWidth - 28, 1);
-            Console.Write("     ");
-            Console.SetCursorPosition(Console.WindowWidth - 28, 1);
-            Console.Write("Y: " + cursorY);
+            WriteCursorPosition(cursorX, cursorY);
 
             while (!exitLoop) {
 
-                //Write the current X and Y values of the cursor to the title bar, to aid in drawing (hopefully)
-                Console.SetCursorPosition(Console.WindowWidth - 28, 0);
-                Console.Write("     ");
-                Console.SetCursorPosition(Console.WindowWidth - 28, 0);
-                Console.Write("X: " + cursorX);
-                Console.SetCursorPosition(Console.WindowWidth - 28, 1);
-                Console.Write("     ");
-                Console.SetCursorPosition(Console.WindowWidth - 28, 1);
-                Console.Write("Y: " + cursorY);
+                WriteCursorPosition(cursorX, cursorY);
 
                 Console.SetCursorPosition(cursorX, cursorY + 3);    //Account for title bar offset
 
@@ -163,6 +154,7 @@ namespace CLI_paint
                         Console.Clear();
                         DrawPaintGUI(name, width, height);
                         UpdatePaintGUI(currentForeColour, currentBackColour, currentShading);
+                        WriteCursorPosition(cursorX, cursorY);
                         DrawEntirePicture(foreColorBuffer, backColorBuffer, shadingBuffer, width, height);
                         break;
                     case 81:
@@ -172,6 +164,21 @@ namespace CLI_paint
                 }
             }
 
+        }
+
+        void WriteCursorPosition(int cursorX, int cursorY)
+        {
+            //Write the current X and Y values of the cursor to the title bar, to aid in drawing (hopefully)
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.SetCursorPosition(Console.WindowWidth - 28, 0);
+            Console.Write("     ");
+            Console.SetCursorPosition(Console.WindowWidth - 28, 0);
+            Console.Write("X: " + cursorX);
+            Console.SetCursorPosition(Console.WindowWidth - 28, 1);
+            Console.Write("     ");
+            Console.SetCursorPosition(Console.WindowWidth - 28, 1);
+            Console.Write("Y: " + cursorY);
         }
 
         void DrawPaintGUI(string name, int width, int height)
