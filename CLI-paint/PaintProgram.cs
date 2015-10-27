@@ -67,6 +67,9 @@ namespace CLI_paint
 			int[,] backColorBuffer = new int[width, height];
 			int[,] shadingBuffer = new int[width, height];
 
+			int cScreenWidth;	//current screen width
+			int cScreenHeight;	//current screen height
+
 			//Initialise the three buffers such that the image would be pure black.
 
 			for (int x = 0; x < width; x++) {
@@ -77,6 +80,7 @@ namespace CLI_paint
 				}
 			}
 
+			/* Currently, window resizing is disabled in order to test the viewport
 			//Ensure the console window is never too small
 			if (width > 60) {
 				if (height > 21)
@@ -88,57 +92,103 @@ namespace CLI_paint
 			} else {
 				Console.SetWindowSize (80, 25);
 			}
+			*/
+
+			cScreenWidth = Console.WindowWidth;
+			cScreenHeight = Console.WindowHeight;
 
 			Console.Clear ();
-			DrawPaintGUI (name, width, height);
 
 			int cursorX = 0;
 			int cursorY = 0;
+
+			int viewportX = 0;
+			int viewportY = 0;
+			int viewportWidth = Console.WindowWidth - 20;
+			int viewportHeight = Console.WindowHeight - 4;
+
 			int currentForeColour = 0;
 			int currentBackColour = 0;
 			int currentShading = 1;
 
+			DrawPaintGUI (name, viewportWidth, viewportHeight);
 			UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
 			WriteCursorPosition (cursorX, cursorY);
 
 			while (!exitLoop) {
 
+				//Check if the window has been resized
+				if (cScreenWidth != Console.WindowWidth || cScreenHeight != Console.WindowHeight) {
+					Console.Clear ();
+					DrawPaintGUI (name, viewportWidth, viewportHeight);
+					UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
+					DrawSubImage (foreColorBuffer, backColorBuffer, shadingBuffer, width, height, viewportX, viewportY, viewportWidth, viewportHeight);
+
+					cScreenWidth = Console.WindowWidth;
+					cScreenHeight = Console.WindowHeight;
+					viewportWidth = Console.WindowWidth - 20;
+					viewportHeight = Console.WindowHeight - 4;
+				}
+
 				WriteCursorPosition (cursorX, cursorY);
 
-				Console.SetCursorPosition (cursorX, cursorY + 3);
+				Console.SetCursorPosition (cursorX - viewportX, cursorY - viewportY + 3);
 				Console.Write ("X");
-				Console.SetCursorPosition (cursorX, cursorY + 3);
-
+				Console.SetCursorPosition (cursorX - viewportX, cursorY - viewportY + 3);
 
 				int userInput = (int)Console.ReadKey (true).Key;
 
 				switch (userInput) {
 				case 37:
                         //Left arrow
-					if (cursorX - 1 >= 0) {
-						DrawSinglePixel (foreColorBuffer [cursorX, cursorY], backColorBuffer [cursorX, cursorY], shadingBuffer [cursorX, cursorY], cursorX, cursorY);
+					if (cursorX - 1 >= viewportX) {
+						DrawSinglePixel (foreColorBuffer [cursorX, cursorY], backColorBuffer [cursorX, cursorY], shadingBuffer [cursorX, cursorY], cursorX - viewportX, cursorY - viewportY);
 						cursorX--;
+					} else {
+						if (viewportX > 0) {
+							viewportX--;
+							cursorX--;
+							DrawSubImage (foreColorBuffer, backColorBuffer, shadingBuffer, width, height, viewportX, viewportY, viewportWidth, viewportHeight);
+						}
 					}
 					break;
 				case 38:
                         //Up arrow
-					if (cursorY - 1 >= 0) {
-						DrawSinglePixel (foreColorBuffer [cursorX, cursorY], backColorBuffer [cursorX, cursorY], shadingBuffer [cursorX, cursorY], cursorX, cursorY);
+					if (cursorY - 1 >= viewportY) {
+						DrawSinglePixel (foreColorBuffer [cursorX, cursorY], backColorBuffer [cursorX, cursorY], shadingBuffer [cursorX, cursorY], cursorX - viewportX, cursorY - viewportY);
 						cursorY--;
+					} else {
+						if (viewportY > 0) {
+							viewportY--;
+							cursorY--;
+							DrawSubImage (foreColorBuffer, backColorBuffer, shadingBuffer, width, height, viewportX, viewportY, viewportWidth, viewportHeight);
+						}
 					}
 					break;
 				case 39:
                         //Right arrow
-					if (cursorX + 1 < width) {
-						DrawSinglePixel (foreColorBuffer [cursorX, cursorY], backColorBuffer [cursorX, cursorY], shadingBuffer [cursorX, cursorY], cursorX, cursorY);
+					if (cursorX + 1 < viewportX + viewportWidth) {
+						DrawSinglePixel (foreColorBuffer [cursorX, cursorY], backColorBuffer [cursorX, cursorY], shadingBuffer [cursorX, cursorY], cursorX - viewportX, cursorY - viewportY);
 						cursorX++;
+					} else {
+						if (viewportX + viewportWidth < width) {
+							viewportX++;
+							cursorX++;
+							DrawSubImage (foreColorBuffer, backColorBuffer, shadingBuffer, width, height, viewportX, viewportY, viewportWidth, viewportHeight);
+						}
 					}
 					break;
 				case 40:
                         //Down arrow
-					if (cursorY + 1 < height) {
-						DrawSinglePixel (foreColorBuffer [cursorX, cursorY], backColorBuffer [cursorX, cursorY], shadingBuffer [cursorX, cursorY], cursorX, cursorY);
+					if (cursorY + 1 < viewportY + viewportHeight) {
+						DrawSinglePixel (foreColorBuffer [cursorX, cursorY], backColorBuffer [cursorX, cursorY], shadingBuffer [cursorX, cursorY], cursorX - viewportX, cursorY - viewportY);
 						cursorY++;
+					} else {
+						if (viewportY + viewportHeight < height) {
+							viewportY++;
+							cursorY++;
+							DrawSubImage (foreColorBuffer, backColorBuffer, shadingBuffer, width, height, viewportX, viewportY, viewportWidth, viewportHeight);
+						}
 					}
 					break;
 				case 32:
@@ -146,7 +196,7 @@ namespace CLI_paint
 					foreColorBuffer [cursorX, cursorY] = currentForeColour;
 					backColorBuffer [cursorX, cursorY] = currentBackColour;
 					shadingBuffer [cursorX, cursorY] = currentShading;
-					DrawSinglePixel (currentForeColour, currentBackColour, currentShading, cursorX, cursorY);
+					DrawSinglePixel (currentForeColour, currentBackColour, currentShading, cursorX - viewportX, cursorY - viewportY);
 					break;
 				case 49:
                         //1, decrease fcolor
@@ -189,7 +239,7 @@ namespace CLI_paint
 					Console.ForegroundColor = ConsoleColor.White;
 					Console.BackgroundColor = ConsoleColor.Black;
 					Console.Clear ();
-					DrawPaintGUI (name, width, height);
+					DrawPaintGUI (name, viewportWidth, viewportHeight);
 					UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
 					WriteCursorPosition (cursorX, cursorY);
 					DrawEntirePicture (foreColorBuffer, backColorBuffer, shadingBuffer, width, height);
@@ -380,6 +430,54 @@ namespace CLI_paint
 					Console.BackgroundColor = (ConsoleColor)bcbuffer [x, y - 3];
 
 					switch (sbuffer [x, y - 3]) {
+					case 1:
+						Console.Write ("░");
+						break;
+					case 2:
+						Console.Write ("▒");
+						break;
+					case 3:
+						Console.Write ("▓");
+						break;
+					case 4:
+						Console.Write ("█");
+						break;
+					case 5:
+						Console.Write ("▄");
+						break;
+					case 6:
+						Console.Write ("▀");
+						break;
+					case 7:
+						Console.Write ("▌");
+						break;
+					case 8:
+						Console.Write ("▐");
+						break;
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Draws the specified area of the original image
+		/// </summary>
+		/// <param name="fcbuffer">Fcbuffer.</param>
+		/// <param name="bcbuffer">Bcbuffer.</param>
+		/// <param name="sbuffer">Sbuffer.</param>
+		/// <param name="imageWidth">Image width.</param>
+		/// <param name="imageHeight">Image height.</param>
+		/// <param name="viewportWidth">Viewport width.</param>
+		/// <param name="viewportHeight">Viewport height.</param>
+		void DrawSubImage (int[,] fcbuffer, int[,] bcbuffer, int[,] sbuffer, int imageWidth, int imageHeight, int viewportX, int viewportY, int viewportWidth, int viewportHeight)
+		{
+			for (int y = 3; y < viewportHeight + 3; y++) {
+				Console.SetCursorPosition (0, y);
+				for (int x = 0; x < viewportWidth; x++) {
+					Console.ForegroundColor = (ConsoleColor)fcbuffer [x + viewportX, (y - 3) + viewportY];
+					Console.BackgroundColor = (ConsoleColor)bcbuffer [x + viewportX, (y - 3) + viewportY];
+
+					switch (sbuffer [x + viewportX, (y - 3) + viewportY]) {
 					case 1:
 						Console.Write ("░");
 						break;
