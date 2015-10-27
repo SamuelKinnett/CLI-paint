@@ -104,14 +104,26 @@ namespace CLI_paint
 
 			int viewportX = 0;
 			int viewportY = 0;
-			int viewportWidth = Console.WindowWidth - 20;
-			int viewportHeight = Console.WindowHeight - 4;
+			int viewportWidth = 0;
+			int viewportHeight = 0;
+
+			//If the viewport is smaller than the drawing area, we need to set the viewport size to the image size
+			if (width < Console.WindowWidth - 20) {
+				viewportWidth = width;
+			} else {
+				viewportWidth = Console.WindowWidth - 20;
+			}
+			if (height < Console.WindowHeight - 4) {
+				viewportHeight = height;
+			} else {
+				viewportHeight = Console.WindowHeight - 4;
+			}
 
 			int currentForeColour = 0;
 			int currentBackColour = 0;
 			int currentShading = 1;
 
-			DrawPaintGUI (name, viewportWidth, viewportHeight);
+			DrawPaintGUI (name, width, height, viewportWidth, viewportHeight);
 			UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
 			WriteCursorPosition (cursorX, cursorY);
 
@@ -120,7 +132,7 @@ namespace CLI_paint
 				//Check if the window has been resized
 				if (cScreenWidth != Console.WindowWidth || cScreenHeight != Console.WindowHeight) {
 					Console.Clear ();
-					DrawPaintGUI (name, viewportWidth, viewportHeight);
+					DrawPaintGUI (name, width, height, viewportWidth, viewportHeight);
 					UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
 					DrawSubImage (foreColorBuffer, backColorBuffer, shadingBuffer, width, height, viewportX, viewportY, viewportWidth, viewportHeight);
 
@@ -239,7 +251,7 @@ namespace CLI_paint
 					Console.ForegroundColor = ConsoleColor.White;
 					Console.BackgroundColor = ConsoleColor.Black;
 					Console.Clear ();
-					DrawPaintGUI (name, viewportWidth, viewportHeight);
+					DrawPaintGUI (name, width, height, viewportWidth, viewportHeight);
 					UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
 					WriteCursorPosition (cursorX, cursorY);
 					DrawEntirePicture (foreColorBuffer, backColorBuffer, shadingBuffer, width, height);
@@ -268,11 +280,11 @@ namespace CLI_paint
 			Console.Write ("Y: " + cursorY);
 		}
 
-		void DrawPaintGUI (string name, int width, int height)
+		void DrawPaintGUI (string name, int width, int height, int viewportWidth, int viewportHeight)
 		{
 			for (int y = 0; y < Console.WindowHeight; y++) {
 				Console.SetCursorPosition (Console.WindowWidth - 20, y);
-				if (y == height + 3 || y == 2)
+				if (y == viewportHeight + 3 || y == 2)
 					Console.Write ("┤");
 				else
 					Console.Write ("│");
@@ -285,7 +297,7 @@ namespace CLI_paint
 			}
 
 			//Draws the horizontal line for the bottom of the image box
-			Console.SetCursorPosition (0, height + 3);
+			Console.SetCursorPosition (0, viewportHeight + 3);
 			for (int x = 0; x < Console.WindowWidth - 20; x++) {
 				Console.Write ("─");
 			}

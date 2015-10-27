@@ -39,12 +39,13 @@ using System;
 
 namespace CLI_paint
 {
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            PaintProgram program = new PaintProgram();
-            program.Run();
-        }
-    }
+	class Program
+	{
+		static void Main (string[] args)
+		{
+			PaintProgram program = new PaintProgram ();
+			program.Run ();
+			Console.Clear ();	//Ensure the console is cleared, mostly for GNU/Linux users
+		}
+	}
 }
