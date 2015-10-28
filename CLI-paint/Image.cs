@@ -28,11 +28,9 @@ namespace CLI_paint
 		public int[,] bcBuffer;
 		public int[,] sBuffer;
 
-		public int width { get; }
-
-		public int height { get; }
-
-		public string name { get; }
+        public int width;
+        public int height;
+        public string name;
 
 		public Image (string name, int width, int height)
 		{

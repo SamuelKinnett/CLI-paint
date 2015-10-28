@@ -43,7 +43,7 @@ namespace CLI_paint
 		public int SaveImage (Image imageToSave)
 		{
 			streamWriter = new StreamWriter (imageToSave.name + ".aspic", false);
-			string header = imageToSave.width + ":" + imageToSave.height + "\r\n";
+			string header = imageToSave.name + ":" + imageToSave.width + ":" + imageToSave.height + "\r\n";
 			streamWriter.Write (header);
 			for (int y = 0; y < imageToSave.height; y++) {
 				for (int x = 0; x < imageToSave.width; x++) {

@@ -47,7 +47,7 @@ namespace CLI_paint
 
 				Console.Clear ();
 				Console.WriteLine ("Welcome to Console Paint!");
-				Console.WriteLine ("Would you like to (C)reate or (O)pen a picture?");
+				Console.WriteLine ("Would you like to (C)reate or (O)pen a picture, or (Q)uit?");
 
 				userInput = Console.ReadLine ().ToUpper ();
 
@@ -60,13 +60,15 @@ namespace CLI_paint
 					Console.Write ("Please enter height: ");
 					int height = int.Parse (Console.ReadLine ());
 					Paint (new Image (name, width, height));
-					exitProgram = true;
 					break;
 				case "O":
 					Console.Write ("Name of image to load: ");
 					string imageName = Console.ReadLine ();
 					Paint (fileManager.LoadImage (imageName));
 					break;
+                case "Q":
+                    exitProgram = true;
+                    break;
 				}
 			}
 		}
@@ -124,6 +126,7 @@ namespace CLI_paint
 			GUI.DrawPaintGUI (image.name, image.width, image.height, viewportWidth, viewportHeight);
 			GUI.UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
 			GUI.WriteCursorPosition (cursorX, cursorY);
+            GUI.DrawSubImage(image.fcBuffer, image.bcBuffer, image.sBuffer, image.width, image.height, viewportX, viewportY, viewportWidth, viewportHeight);
 
 			while (!exitLoop) {
 
