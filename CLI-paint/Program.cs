@@ -16,7 +16,7 @@
     8   -   ▐   -   Left half background, right half foreground
 
     Each file also contains a header containing the width and height. Pixels, and the header, are
-    separated by semicolons while individual values within each pixel and the header are separated
+    separated by newlines while individual values within each pixel and the header are separated
     by colons.
 
     This file is part of CLI-paint.
@@ -32,7 +32,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+    along with CLI-paint.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 using System;
