@@ -64,8 +64,6 @@ namespace CLI_paint
         /// <summary>
         /// Saves an image using lossless compression
         /// </summary>
-        /// <param name="imageToSave"></param>
-        /// <returns></returns>
         public int SaveImageCompressed(Image imageToSave)
         {
             streamWriter = new StreamWriter(imageToSave.name + ".aspic", false);
@@ -74,13 +72,17 @@ namespace CLI_paint
 
             //Now we need to look throught the image and create a "palette" of all the different pixel types present.
             List<Image.Pixel> pixelTypes = new List<Image.Pixel>();
+            int[,] paletteMap = new int[imageToSave.width, imageToSave.height]; //Used to store the palette value of each pixel
             pixelTypes.Add(imageToSave.data[0, 0]);
 
             for (int y = 0; y < imageToSave.height; y++) {
                 for (int x = 0; x < imageToSave.width; x++) {
                     //Iterate through each pixel currently saved in the palette
                     bool newPixel = true;
+                    int currentPixelValue = -1;
+
                     foreach (Image.Pixel currentPixel in pixelTypes) {
+                        currentPixelValue++;
                         if (currentPixel == imageToSave.data[x, y])
                         {
                             newPixel = false;
@@ -88,8 +90,10 @@ namespace CLI_paint
                         }
                     }
                     if (newPixel) {
+                        currentPixelValue++;
                         pixelTypes.Add(imageToSave.data[x, y]);
                     }
+                    paletteMap[x, y] = currentPixelValue;
                 }
             }
 
@@ -101,32 +105,31 @@ namespace CLI_paint
             streamWriter.Write("\r\n");
 
             //Now, look throught the image, finding adjacent blocks of pixels. Each adjacent block is saved as the index in the palette followed by the number that occur.
-            Image.Pixel lastPixel = new Image.Pixel(-1, -1, -1);   //The pixel we are currently comparing to
-            int pixelCount = 0; //The number of that pixel occurring
-            int pixelIndex = 0;     //The index in the list of the pixel
+            int pixelCount = 0;     //The number of that pixel occurring
+            int pixelIndex = -1;     //The palette index of the last pixel
             for (int y = 0; y < imageToSave.height; y++) {
                 for (int x = 0; x < imageToSave.width; x++) {
-                    if (imageToSave.data[x, y] == lastPixel) {
+                    if (paletteMap[x, y] == pixelIndex) {
                         //We need to simply increment the pixelCount variable
                         pixelCount++;
-                    } else {
+                    }
+                    else {
                         //If we need to, write the data for the last block of pixels
                         if (pixelCount > 0) {
                             streamWriter.Write(pixelIndex + ":" + pixelCount + "\r\n");
                         }
-                        pixelCount = 0;
-                        pixelIndex = -1;
-                        foreach (Image.Pixel cPixel in pixelTypes) {
-                            pixelIndex++;
-                            if (cPixel == imageToSave.data[x, y]) {
-                                lastPixel = cPixel;
-                                break;
-                            }
-                        }
+                        pixelCount = 1; //Since we've just counted the new pixel
+                        pixelIndex = paletteMap[x, y];  //The new 
                     }
                 }
             }
 
+            //Make sure to check if the last block has been written
+            if (pixelCount > 0) {
+                streamWriter.Write(pixelIndex + ":" + pixelCount + "\r\n");
+            }
+
+            //Close the StreamWriter, we're done here!
             streamWriter.Close();
             return 0;
         }
@@ -177,7 +180,7 @@ namespace CLI_paint
             string[] paletteRawData = streamReader.ReadLine().Split(':');
             //Split the string up and convert it into an array of Image.Pixel types
             int paletteSize = paletteRawData.Length;
-            Image.Pixel[] palette = new Image.Pixel[paletteSize];
+            Image.Pixel[] palette = new Image.Pixel[paletteSize - 1];
 
             for (int count = 0; count < paletteSize - 1; count++) {
                 string[] pixelData = paletteRawData[count].Split(',');
@@ -189,7 +192,7 @@ namespace CLI_paint
             int xPointer = -1;   //Where in the 2D array our pointer is located
             int yPointer = 0;   //
 
-            while (yPointer < imageToReturn.height) {
+            while (yPointer < imageToReturn.height - 1 && xPointer < imageToReturn.width - 1) {
                 string[] rawData = streamReader.ReadLine().Split(':');
                 int paletteIndex = int.Parse(rawData[0]);
                 int pixelCount = int.Parse(rawData[1]);
