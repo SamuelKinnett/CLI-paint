@@ -197,67 +197,21 @@ namespace CLI_paint
 			Console.Write ("^");
 		}
 
-
-		/* DEPRECTATED
-		 * Use Viewports now
-		public void DrawEntirePicture (int[,] fcbuffer, int[,] bcbuffer, int[,] sbuffer, int width, int height)
-		{
-			for (int y = 3; y < height + 3; y++) {
-				Console.SetCursorPosition (0, y);
-				for (int x = 0; x < width; x++) {
-					Console.ForegroundColor = (ConsoleColor)fcbuffer [x, y - 3];
-					Console.BackgroundColor = (ConsoleColor)bcbuffer [x, y - 3];
-
-					switch (sbuffer [x, y - 3]) {
-					case 1:
-						Console.Write ("░");
-						break;
-					case 2:
-						Console.Write ("▒");
-						break;
-					case 3:
-						Console.Write ("▓");
-						break;
-					case 4:
-						Console.Write ("█");
-						break;
-					case 5:
-						Console.Write ("▄");
-						break;
-					case 6:
-						Console.Write ("▀");
-						break;
-					case 7:
-						Console.Write ("▌");
-						break;
-					case 8:
-						Console.Write ("▐");
-						break;
-					}
-				}
-			}
-		}
-		*/
-
 		/// <summary>
 		/// Draws the specified area of the original image
 		/// </summary>
-		/// <param name="fcbuffer">Fcbuffer.</param>
-		/// <param name="bcbuffer">Bcbuffer.</param>
-		/// <param name="sbuffer">Sbuffer.</param>
-		/// <param name="imageWidth">Image width.</param>
-		/// <param name="imageHeight">Image height.</param>
-		/// <param name="viewportWidth">Viewport width.</param>
-		/// <param name="viewportHeight">Viewport height.</param>
-		public void DrawSubImage (int[,] fcbuffer, int[,] bcbuffer, int[,] sbuffer, int imageWidth, int imageHeight, int viewportX, int viewportY, int viewportWidth, int viewportHeight)
+		public void DrawSubImage (Image imageToRender, int viewportX, int viewportY, int viewportWidth, int viewportHeight)
 		{
 			for (int y = 3; y < viewportHeight + 3; y++) {
 				Console.SetCursorPosition (0, y);
 				for (int x = 0; x < viewportWidth; x++) {
-					Console.ForegroundColor = (ConsoleColor)fcbuffer [x + viewportX, (y - 3) + viewportY];
-					Console.BackgroundColor = (ConsoleColor)bcbuffer [x + viewportX, (y - 3) + viewportY];
+                    //Get the current pixel's information
+                    int[] cPixel = imageToRender.data[x + viewportX, (y - 3) + viewportY].GetPixel();
 
-					switch (sbuffer [x + viewportX, (y - 3) + viewportY]) {
+					Console.ForegroundColor = (ConsoleColor)cPixel[0];
+					Console.BackgroundColor = (ConsoleColor)cPixel[1];
+
+					switch (cPixel[2]) {
 					case 1:
 						Console.Write ("░");
 						break;
@@ -287,13 +241,13 @@ namespace CLI_paint
 			}
 		}
 
-		public void DrawSinglePixel (int fcolor, int bcolor, int shading, int x, int y)
+		public void DrawSinglePixel (Image.Pixel pixelToDraw, int x, int y)
 		{
 			Console.SetCursorPosition (x, y + 3);    //Account for title bar
-			Console.ForegroundColor = (ConsoleColor)fcolor;
-			Console.BackgroundColor = (ConsoleColor)bcolor;
+			Console.ForegroundColor = (ConsoleColor)pixelToDraw.fc;
+			Console.BackgroundColor = (ConsoleColor)pixelToDraw.bc;
 
-			switch (shading) {
+			switch (pixelToDraw.s) {
 			case 1:
 				Console.Write ("░");
 				break;

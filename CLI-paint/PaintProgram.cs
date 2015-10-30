@@ -47,7 +47,7 @@ namespace CLI_paint
 
 				Console.Clear ();
 				Console.WriteLine ("Welcome to Console Paint!");
-				Console.WriteLine ("Would you like to (C)reate or (O)pen a picture, or (Q)uit?");
+				Console.WriteLine ("Would you like to (C)reate or (OC/O)pen a picture, or (Q)uit?");
 
 				userInput = Console.ReadLine ().ToUpper ();
 
@@ -66,6 +66,11 @@ namespace CLI_paint
 					string imageName = Console.ReadLine ();
 					Paint (fileManager.LoadImage (imageName));
 					break;
+                case "OC":
+                    Console.Write ("Name of compressed image to load: ");
+					string imageName2 = Console.ReadLine ();
+					Paint (fileManager.LoadImageCompressed (imageName2));
+                    break;
                 case "Q":
                     exitProgram = true;
                     break;
@@ -126,7 +131,7 @@ namespace CLI_paint
 			GUI.DrawPaintGUI (image.name, image.width, image.height, viewportWidth, viewportHeight);
 			GUI.UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
 			GUI.WriteCursorPosition (cursorX, cursorY);
-            GUI.DrawSubImage(image.fcBuffer, image.bcBuffer, image.sBuffer, image.width, image.height, viewportX, viewportY, viewportWidth, viewportHeight);
+            GUI.DrawSubImage(image, viewportX, viewportY, viewportWidth, viewportHeight);
 
 			while (!exitLoop) {
 
@@ -135,7 +140,7 @@ namespace CLI_paint
 					Console.Clear ();
 					GUI.DrawPaintGUI (image.name, image.width, image.height, viewportWidth, viewportHeight);
 					GUI.UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
-					GUI.DrawSubImage (image.fcBuffer, image.bcBuffer, image.sBuffer, image.width, image.height, viewportX, viewportY, viewportWidth, viewportHeight);
+                    GUI.DrawSubImage(image, viewportX, viewportY, viewportWidth, viewportHeight);
 
 					cScreenWidth = Console.WindowWidth;
 					cScreenHeight = Console.WindowHeight;
@@ -155,61 +160,59 @@ namespace CLI_paint
 				case 37:
                         //Left arrow
 					if (cursorX - 1 >= viewportX) {
-						GUI.DrawSinglePixel (image.fcBuffer [cursorX, cursorY], image.bcBuffer [cursorX, cursorY], image.sBuffer [cursorX, cursorY], cursorX - viewportX, cursorY - viewportY);
+						GUI.DrawSinglePixel (image.data[cursorX, cursorY], cursorX - viewportX, cursorY - viewportY);
 						cursorX--;
 					} else {
 						if (viewportX > 0) {
 							viewportX--;
 							cursorX--;
-							GUI.DrawSubImage (image.fcBuffer, image.bcBuffer, image.sBuffer, image.width, image.height, viewportX, viewportY, viewportWidth, viewportHeight);
+                            GUI.DrawSubImage(image, viewportX, viewportY, viewportWidth, viewportHeight);
 						}
 					}
 					break;
 				case 38:
                         //Up arrow
 					if (cursorY - 1 >= viewportY) {
-						GUI.DrawSinglePixel (image.fcBuffer [cursorX, cursorY], image.bcBuffer [cursorX, cursorY], image.sBuffer [cursorX, cursorY], cursorX - viewportX, cursorY - viewportY);
+                        GUI.DrawSinglePixel(image.data[cursorX, cursorY], cursorX - viewportX, cursorY - viewportY);
 						cursorY--;
 					} else {
 						if (viewportY > 0) {
 							viewportY--;
 							cursorY--;
-							GUI.DrawSubImage (image.fcBuffer, image.bcBuffer, image.sBuffer, image.width, image.height, viewportX, viewportY, viewportWidth, viewportHeight);
+                            GUI.DrawSubImage(image, viewportX, viewportY, viewportWidth, viewportHeight);
 						}
 					}
 					break;
 				case 39:
                         //Right arrow
 					if (cursorX + 1 < viewportX + viewportWidth) {
-						GUI.DrawSinglePixel (image.fcBuffer [cursorX, cursorY], image.bcBuffer [cursorX, cursorY], image.sBuffer [cursorX, cursorY], cursorX - viewportX, cursorY - viewportY);
+                        GUI.DrawSinglePixel(image.data[cursorX, cursorY], cursorX - viewportX, cursorY - viewportY);
 						cursorX++;
 					} else {
 						if (viewportX + viewportWidth < image.width) {
 							viewportX++;
 							cursorX++;
-							GUI.DrawSubImage (image.fcBuffer, image.bcBuffer, image.sBuffer, image.width, image.height, viewportX, viewportY, viewportWidth, viewportHeight);
+                            GUI.DrawSubImage(image, viewportX, viewportY, viewportWidth, viewportHeight);
 						}
 					}
 					break;
 				case 40:
                         //Down arrow
 					if (cursorY + 1 < viewportY + viewportHeight) {
-						GUI.DrawSinglePixel (image.fcBuffer [cursorX, cursorY], image.bcBuffer [cursorX, cursorY], image.sBuffer [cursorX, cursorY], cursorX - viewportX, cursorY - viewportY);
+                        GUI.DrawSinglePixel(image.data[cursorX, cursorY], cursorX - viewportX, cursorY - viewportY);
 						cursorY++;
 					} else {
 						if (viewportY + viewportHeight < image.height) {
 							viewportY++;
 							cursorY++;
-							GUI.DrawSubImage (image.fcBuffer, image.bcBuffer, image.sBuffer, image.width, image.height, viewportX, viewportY, viewportWidth, viewportHeight);
+                            GUI.DrawSubImage(image, viewportX, viewportY, viewportWidth, viewportHeight);
 						}
 					}
 					break;
 				case 32:
                         //Space bar
-					image.fcBuffer [cursorX, cursorY] = currentForeColour;
-					image.bcBuffer [cursorX, cursorY] = currentBackColour;
-					image.sBuffer [cursorX, cursorY] = currentShading;
-					GUI.DrawSinglePixel (currentForeColour, currentBackColour, currentShading, cursorX - viewportX, cursorY - viewportY);
+                    image.data[cursorX, cursorY].SetPixel(currentForeColour, currentBackColour, currentShading);
+					GUI.DrawSinglePixel (image.data[cursorX, cursorY], cursorX - viewportX, cursorY - viewportY);
 					break;
 				case 49:
                         //1, decrease fcolor
@@ -255,7 +258,7 @@ namespace CLI_paint
 					GUI.DrawPaintGUI (image.name, image.width, image.height, viewportWidth, viewportHeight);
 					GUI.UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
 					GUI.WriteCursorPosition (cursorX, cursorY);
-					GUI.DrawSubImage (image.fcBuffer, image.bcBuffer, image.sBuffer, image.width, image.height, viewportX, viewportY, viewportWidth, viewportHeight);
+                    GUI.DrawSubImage(image, viewportX, viewportY, viewportWidth, viewportHeight);
 					break;
 				case 83:
 					//s - save the image
@@ -268,7 +271,20 @@ namespace CLI_paint
 					GUI.DrawPaintGUI (image.name, image.width, image.height, viewportWidth, viewportHeight);
 					GUI.UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
 					GUI.WriteCursorPosition (cursorX, cursorY);
-					GUI.DrawSubImage (image.fcBuffer, image.bcBuffer, image.sBuffer, image.width, image.height, viewportX, viewportY, viewportWidth, viewportHeight);
+                    GUI.DrawSubImage(image, viewportX, viewportY, viewportWidth, viewportHeight);
+					break;
+                case 67:
+                    //c - save a compressed image
+                    Console.ForegroundColor = ConsoleColor.White;
+					Console.BackgroundColor = ConsoleColor.Black;
+					Console.Clear ();
+					Console.WriteLine ("Compressing & Saving...");
+					fileManager.SaveImageCompressed (image);
+					Console.Clear ();
+					GUI.DrawPaintGUI (image.name, image.width, image.height, viewportWidth, viewportHeight);
+					GUI.UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
+					GUI.WriteCursorPosition (cursorX, cursorY);
+                    GUI.DrawSubImage(image, viewportX, viewportY, viewportWidth, viewportHeight);
 					break;
 				case 81:
                         //q - quit

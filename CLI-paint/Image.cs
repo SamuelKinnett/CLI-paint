@@ -24,9 +24,52 @@ namespace CLI_paint
 {
 	public class Image
 	{
-		public int[,] fcBuffer;
-		public int[,] bcBuffer;
-		public int[,] sBuffer;
+        /// <summary>
+        /// Class for storing pixel information and methods
+        /// </summary>
+        public class Pixel
+        {
+            public int fc;  //Forecolour
+            public int bc;  //Backcolour
+            public int s;   //Shading
+
+            public Pixel(int fc, int bc, int s)
+            {
+                this.fc = fc;
+                this.bc = bc;
+                this.s = s;
+            }
+
+            public void SetPixel(int fc, int bc, int s)
+            {
+                this.fc = fc;
+                this.bc = bc;
+                this.s = s;
+            }
+
+            public int[] GetPixel()
+            {
+                return new int[3] { fc, bc, s };
+            }
+
+            //Comparison of two pixels
+            public static bool operator ==(Pixel pxOne, Pixel pxTwo)
+            {
+                if (pxOne.fc == pxTwo.fc && pxOne.bc == pxTwo.bc && pxOne.s == pxTwo.s)
+                    return true;
+                else
+                    return false;
+            }
+
+            public static bool operator !=(Pixel pxOne, Pixel pxTwo)
+            {
+                if (pxOne.fc == pxTwo.fc && pxOne.bc == pxTwo.bc && pxOne.s == pxTwo.s)
+                    return false;
+                else
+                    return true;
+            }
+        }
+        public Pixel[,] data;
 
         public int width;
         public int height;
@@ -38,17 +81,13 @@ namespace CLI_paint
 			this.width = width;
 			this.height = height;
 
-			fcBuffer = new int[width, height];
-			bcBuffer = new int[width, height];
-			sBuffer = new int[width, height];
+            data = new Pixel[width, height];
 
 			//Initialise the three buffers such that the image would be pure black.
 
 			for (int x = 0; x < width; x++) {
 				for (int y = 0; y < height; y++) {
-					fcBuffer [x, y] = 0;
-					bcBuffer [x, y] = 0;
-					sBuffer [x, y] = 4;
+                    data[x, y] = new Pixel(0, 0, 4);
 				}
 			}
 		}
