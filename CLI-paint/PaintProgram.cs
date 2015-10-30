@@ -23,279 +23,331 @@ using AspicLibrary;
 
 namespace CLI_paint
 {
-	class PaintProgram
-	{
+    class PaintProgram
+    {
 
-		Rendering GUI;
-		FileManager fileManager;
+        Rendering GUI;
+        FileManager fileManager;
         AspicLibrary.Rendering PicRender;
 
-		public PaintProgram ()
-		{
-			GUI = new Rendering ();
-			fileManager = new FileManager ();
+        public PaintProgram()
+        {
+            GUI = new Rendering();
+            fileManager = new FileManager();
             PicRender = new AspicLibrary.Rendering();
-		}
+        }
 
-		public void Run ()
-		{
-			string userInput;
-			bool exitProgram = false;
+        public void Run()
+        {
+            string userInput;
+            bool exitProgram = false;
 
-			while (!exitProgram) {
+            while (!exitProgram) {
 
-				//Ensure that the background is black
-				Console.BackgroundColor = ConsoleColor.Black;
-				Console.ForegroundColor = ConsoleColor.White;
+                //Ensure that the background is black
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.ForegroundColor = ConsoleColor.White;
 
-				Console.Clear ();
-				Console.WriteLine ("Welcome to Console Paint!");
-				Console.WriteLine ("Would you like to (C)reate or (OC/O)pen a picture, or (Q)uit?");
+                Console.Clear();
+                Console.WriteLine("Welcome to Console Paint!");
+                Console.WriteLine("Would you like to (C)reate or (OC/O)pen a picture, or (Q)uit?");
 
-				userInput = Console.ReadLine ().ToUpper ();
+                userInput = Console.ReadLine().ToUpper();
 
-				switch (userInput) {
-				case "C":
-					Console.Write ("Image Name: ");
-					string name = Console.ReadLine ();
-					Console.Write ("Please enter width: ");
-					int width = int.Parse (Console.ReadLine ());
-					Console.Write ("Please enter height: ");
-					int height = int.Parse (Console.ReadLine ());
-					Paint (new Image (name, width, height));
-					break;
-				case "O":
-					Console.Write ("Name of image to load: ");
-					string imageName = Console.ReadLine ();
-					Paint (fileManager.LoadImage (imageName));
-					break;
-                case "OC":
-                    Console.Write ("Name of compressed image to load: ");
-					string imageName2 = Console.ReadLine ();
-					Paint (fileManager.LoadImageCompressed (imageName2));
-                    break;
-                case "Q":
-                    exitProgram = true;
-                    break;
-				}
-			}
-		}
+                switch (userInput) {
+                    case "C":
+                        Console.Write("Image Name: ");
+                        string name = Console.ReadLine();
+                        Console.Write("Please enter width: ");
+                        int width = int.Parse(Console.ReadLine());
+                        Console.Write("Please enter height: ");
+                        int height = int.Parse(Console.ReadLine());
+                        Paint(new Image(name, width, height));
+                        break;
+                    case "O":
+                        Console.Write("Name of image to load: ");
+                        string imageName = Console.ReadLine();
+                        Paint(fileManager.LoadImage(imageName));
+                        break;
+                    case "OC":
+                        Console.Write("Name of compressed image to load: ");
+                        string imageName2 = Console.ReadLine();
+                        Paint(fileManager.LoadImageCompressed(imageName2));
+                        break;
+                    case "Q":
+                        exitProgram = true;
+                        break;
+                }
+            }
+        }
 
-		void Paint (Image image)
-		{
-			bool exitLoop = false;
+        void Paint(Image image)
+        {
+            bool exitLoop = false;
 
-			int cScreenWidth;	//current screen width
-			int cScreenHeight;	//current screen height
+            int cScreenWidth;	//current screen width
+            int cScreenHeight;	//current screen height
 
-			/* Currently, window resizing is disabled in order to test the viewport
-			//Ensure the console window is never too small
-			if (width > 60) {
-				if (height > 21)
-					Console.SetWindowSize (width + 20, height + 4);
-				else
-					Console.SetWindowSize (width + 20, 25);
-			} else if (height > 21) {
-				Console.SetWindowSize (80, height + 4);
-			} else {
-				Console.SetWindowSize (80, 25);
-			}
-			*/
+            /* Currently, window resizing is disabled in order to test the viewport
+            //Ensure the console window is never too small
+            if (width > 60) {
+                if (height > 21)
+                    Console.SetWindowSize (width + 20, height + 4);
+                else
+                    Console.SetWindowSize (width + 20, 25);
+            } else if (height > 21) {
+                Console.SetWindowSize (80, height + 4);
+            } else {
+                Console.SetWindowSize (80, 25);
+            }
+            */
 
-			cScreenWidth = Console.WindowWidth;
-			cScreenHeight = Console.WindowHeight;
+            cScreenWidth = Console.WindowWidth;
+            cScreenHeight = Console.WindowHeight;
 
-			Console.Clear ();
+            Console.Clear();
 
-			int cursorX = 0;
-			int cursorY = 0;
+            int cursorX = 0;
+            int cursorY = 0;
 
-			int viewportX = 0;
-			int viewportY = 0;
-			int viewportWidth = 0;
-			int viewportHeight = 0;
+            int viewportX = 0;
+            int viewportY = 0;
+            int viewportWidth = 0;
+            int viewportHeight = 0;
 
-			//If the viewport is smaller than the drawing area, we need to set the viewport size to the image size
-			if (image.width < Console.WindowWidth - 20) {
-				viewportWidth = image.width;
-			} else {
-				viewportWidth = Console.WindowWidth - 20;
-			}
-			if (image.height < Console.WindowHeight - 4) {
-				viewportHeight = image.height;
-			} else {
-				viewportHeight = Console.WindowHeight - 4;
-			}
+            //If the viewport is smaller than the drawing area, we need to set the viewport size to the image size
+            if (image.width < Console.WindowWidth - 20) {
+                viewportWidth = image.width;
+            }
+            else {
+                viewportWidth = Console.WindowWidth - 20;
+            }
+            if (image.height < Console.WindowHeight - 4) {
+                viewportHeight = image.height;
+            }
+            else {
+                viewportHeight = Console.WindowHeight - 4;
+            }
 
-			int currentForeColour = 0;
-			int currentBackColour = 0;
-			int currentShading = 1;
+            int currentForeColour = 0;
+            int currentBackColour = 0;
+            int currentShading = 1;
 
-			GUI.DrawPaintGUI (image.name, image.width, image.height, viewportWidth, viewportHeight);
-			GUI.UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
-			GUI.WriteCursorPosition (cursorX, cursorY);
+            GUI.DrawPaintGUI(image.name, image.width, image.height, viewportWidth, viewportHeight);
+            GUI.UpdatePaintGUI(currentForeColour, currentBackColour, currentShading);
+            GUI.WriteCursorPosition(cursorX, cursorY);
             PicRender.DrawSubImage(image, 0, 3, viewportX, viewportY, viewportWidth, viewportHeight);
 
-			while (!exitLoop) {
+            while (!exitLoop) {
 
-				//Check if the window has been resized
-				if (cScreenWidth != Console.WindowWidth || cScreenHeight != Console.WindowHeight) {
-					Console.Clear ();
-					GUI.DrawPaintGUI (image.name, image.width, image.height, viewportWidth, viewportHeight);
-					GUI.UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
+                //Check if the window has been resized
+                if (cScreenWidth != Console.WindowWidth || cScreenHeight != Console.WindowHeight) {
+                    Console.Clear();
+                    GUI.DrawPaintGUI(image.name, image.width, image.height, viewportWidth, viewportHeight);
+                    GUI.UpdatePaintGUI(currentForeColour, currentBackColour, currentShading);
                     PicRender.DrawSubImage(image, 0, 3, viewportX, viewportY, viewportWidth, viewportHeight);
 
-					cScreenWidth = Console.WindowWidth;
-					cScreenHeight = Console.WindowHeight;
-					viewportWidth = Console.WindowWidth - 20;
-					viewportHeight = Console.WindowHeight - 4;
-				}
+                    cScreenWidth = Console.WindowWidth;
+                    cScreenHeight = Console.WindowHeight;
+                    viewportWidth = Console.WindowWidth - 20;
+                    viewportHeight = Console.WindowHeight - 4;
+                }
 
-				GUI.WriteCursorPosition (cursorX, cursorY);
+                GUI.WriteCursorPosition(cursorX, cursorY);
 
-				Console.SetCursorPosition (cursorX - viewportX, cursorY - viewportY + 3);
-				Console.Write ("X");
-				Console.SetCursorPosition (cursorX - viewportX, cursorY - viewportY + 3);
+                Console.SetCursorPosition(cursorX - viewportX, cursorY - viewportY + 3);
+                Console.Write("X");
+                Console.SetCursorPosition(cursorX - viewportX, cursorY - viewportY + 3);
 
-				int userInput = (int)Console.ReadKey (true).Key;
+                int userInput = (int)Console.ReadKey(true).Key;
 
-				switch (userInput) {
-				case 37:
+                switch (userInput) {
+                    case 37:
                         //Left arrow
-					if (cursorX - 1 >= viewportX) {
-						PicRender.DrawSinglePixel (image.data[cursorX, cursorY], cursorX - viewportX, cursorY - viewportY + 3);
-						cursorX--;
-					} else {
-						if (viewportX > 0) {
-							viewportX--;
-							cursorX--;
-                            PicRender.DrawSubImage(image, 0, 3, viewportX, viewportY, viewportWidth, viewportHeight);
-						}
-					}
-					break;
-				case 38:
+                        if (cursorX - 1 >= viewportX) {
+                            PicRender.DrawSinglePixel(image.data[cursorX, cursorY], cursorX - viewportX, cursorY - viewportY + 3);
+                            cursorX--;
+                        }
+                        else {
+                            if (viewportX > 0) {
+                                viewportX--;
+                                cursorX--;
+                                PicRender.DrawSubImage(image, 0, 3, viewportX, viewportY, viewportWidth, viewportHeight);
+                            }
+                        }
+                        break;
+                    case 38:
                         //Up arrow
-					if (cursorY - 1 >= viewportY) {
-                        PicRender.DrawSinglePixel(image.data[cursorX, cursorY], cursorX - viewportX, cursorY - viewportY + 3);
-						cursorY--;
-					} else {
-						if (viewportY > 0) {
-							viewportY--;
-							cursorY--;
-                            PicRender.DrawSubImage(image, 0, 3, viewportX, viewportY, viewportWidth, viewportHeight);
-						}
-					}
-					break;
-				case 39:
+                        if (cursorY - 1 >= viewportY) {
+                            PicRender.DrawSinglePixel(image.data[cursorX, cursorY], cursorX - viewportX, cursorY - viewportY + 3);
+                            cursorY--;
+                        }
+                        else {
+                            if (viewportY > 0) {
+                                viewportY--;
+                                cursorY--;
+                                PicRender.DrawSubImage(image, 0, 3, viewportX, viewportY, viewportWidth, viewportHeight);
+                            }
+                        }
+                        break;
+                    case 39:
                         //Right arrow
-					if (cursorX + 1 < viewportX + viewportWidth) {
-                        PicRender.DrawSinglePixel(image.data[cursorX, cursorY], cursorX - viewportX, cursorY - viewportY + 3);
-						cursorX++;
-					} else {
-						if (viewportX + viewportWidth < image.width) {
-							viewportX++;
-							cursorX++;
-                            PicRender.DrawSubImage(image, 0, 3, viewportX, viewportY, viewportWidth, viewportHeight);
-						}
-					}
-					break;
-				case 40:
+                        if (cursorX + 1 < viewportX + viewportWidth) {
+                            PicRender.DrawSinglePixel(image.data[cursorX, cursorY], cursorX - viewportX, cursorY - viewportY + 3);
+                            cursorX++;
+                        }
+                        else {
+                            if (viewportX + viewportWidth < image.width) {
+                                viewportX++;
+                                cursorX++;
+                                PicRender.DrawSubImage(image, 0, 3, viewportX, viewportY, viewportWidth, viewportHeight);
+                            }
+                        }
+                        break;
+                    case 40:
                         //Down arrow
-					if (cursorY + 1 < viewportY + viewportHeight) {
-                        PicRender.DrawSinglePixel(image.data[cursorX, cursorY], cursorX - viewportX, cursorY - viewportY + 3);
-						cursorY++;
-					} else {
-						if (viewportY + viewportHeight < image.height) {
-							viewportY++;
-							cursorY++;
-                            PicRender.DrawSubImage(image, 0, 3, viewportX, viewportY, viewportWidth, viewportHeight);
-						}
-					}
-					break;
-				case 32:
+                        if (cursorY + 1 < viewportY + viewportHeight) {
+                            PicRender.DrawSinglePixel(image.data[cursorX, cursorY], cursorX - viewportX, cursorY - viewportY + 3);
+                            cursorY++;
+                        }
+                        else {
+                            if (viewportY + viewportHeight < image.height) {
+                                viewportY++;
+                                cursorY++;
+                                PicRender.DrawSubImage(image, 0, 3, viewportX, viewportY, viewportWidth, viewportHeight);
+                            }
+                        }
+                        break;
+                    case 32:
                         //Space bar
-                    image.data[cursorX, cursorY].SetPixel(currentForeColour, currentBackColour, currentShading);
-                    PicRender.DrawSinglePixel(image.data[cursorX, cursorY], cursorX - viewportX, cursorY - viewportY + 3);
-					break;
-				case 49:
+                        image.data[cursorX, cursorY].SetPixel(currentForeColour, currentBackColour, currentShading);
+                        PicRender.DrawSinglePixel(image.data[cursorX, cursorY], cursorX - viewportX, cursorY - viewportY + 3);
+                        break;
+                    case 49:
                         //1, decrease fcolor
-					if (currentForeColour > 0)
-						currentForeColour--;
-					GUI.UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
-					break;
-				case 50:
+                        if (currentForeColour > 0)
+                            currentForeColour--;
+                        GUI.UpdatePaintGUI(currentForeColour, currentBackColour, currentShading);
+                        break;
+                    case 50:
                         //2, increase fcolor
-					if (currentForeColour < 15)
-						currentForeColour++;
-					GUI.UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
-					break;
-				case 51:
+                        if (currentForeColour < 15)
+                            currentForeColour++;
+                        GUI.UpdatePaintGUI(currentForeColour, currentBackColour, currentShading);
+                        break;
+                    case 51:
                         //3, decrease bcolor
-					if (currentBackColour > 0)
-						currentBackColour--;
-					GUI.UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
-					break;
-				case 52:
+                        if (currentBackColour > 0)
+                            currentBackColour--;
+                        GUI.UpdatePaintGUI(currentForeColour, currentBackColour, currentShading);
+                        break;
+                    case 52:
                         //4, increase bcolor
-					if (currentBackColour < 15)
-						currentBackColour++;
-					GUI.UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
-					break;
-				case 53:
+                        if (currentBackColour < 15)
+                            currentBackColour++;
+                        GUI.UpdatePaintGUI(currentForeColour, currentBackColour, currentShading);
+                        break;
+                    case 53:
                         //5, decrease shading
-					if (currentShading > 1)
-						currentShading--;
-					GUI.UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
-					break;
-				case 54:
+                        if (currentShading > 1)
+                            currentShading--;
+                        GUI.UpdatePaintGUI(currentForeColour, currentBackColour, currentShading);
+                        break;
+                    case 54:
                         //6, increase shading
-					if (currentShading < 8)
-						currentShading++;
-					GUI.UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
-					break;
-				case 82:
+                        if (currentShading < 8)
+                            currentShading++;
+                        GUI.UpdatePaintGUI(currentForeColour, currentBackColour, currentShading);
+                        break;
+                    case 82:
                         //r - refresh screen
-					Console.ForegroundColor = ConsoleColor.White;
-					Console.BackgroundColor = ConsoleColor.Black;
-					Console.Clear ();
-					GUI.DrawPaintGUI (image.name, image.width, image.height, viewportWidth, viewportHeight);
-					GUI.UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
-					GUI.WriteCursorPosition (cursorX, cursorY);
-                    PicRender.DrawSubImage(image, 0, 3, viewportX, viewportY, viewportWidth, viewportHeight);
-					break;
-				case 83:
-					//s - save the image
-					Console.ForegroundColor = ConsoleColor.White;
-					Console.BackgroundColor = ConsoleColor.Black;
-					Console.Clear ();
-					Console.WriteLine ("Saving...");
-					fileManager.SaveImage (image);
-					Console.Clear ();
-					GUI.DrawPaintGUI (image.name, image.width, image.height, viewportWidth, viewportHeight);
-					GUI.UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
-					GUI.WriteCursorPosition (cursorX, cursorY);
-                    PicRender.DrawSubImage(image, 0, 3, viewportX, viewportY, viewportWidth, viewportHeight);
-					break;
-                case 67:
-                    //c - save a compressed image
-                    Console.ForegroundColor = ConsoleColor.White;
-					Console.BackgroundColor = ConsoleColor.Black;
-					Console.Clear ();
-					Console.WriteLine ("Compressing & Saving...");
-					fileManager.SaveImageCompressed (image);
-					Console.Clear ();
-					GUI.DrawPaintGUI (image.name, image.width, image.height, viewportWidth, viewportHeight);
-					GUI.UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
-					GUI.WriteCursorPosition (cursorX, cursorY);
-                    PicRender.DrawSubImage(image, 0, 3, viewportX, viewportY, viewportWidth, viewportHeight);
-					break;
-				case 81:
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.Clear();
+                        GUI.DrawPaintGUI(image.name, image.width, image.height, viewportWidth, viewportHeight);
+                        GUI.UpdatePaintGUI(currentForeColour, currentBackColour, currentShading);
+                        GUI.WriteCursorPosition(cursorX, cursorY);
+                        PicRender.DrawSubImage(image, 0, 3, viewportX, viewportY, viewportWidth, viewportHeight);
+                        break;
+                    case 83:
+                        //s - save the image
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.Clear();
+                        Console.WriteLine("Saving...");
+                        fileManager.SaveImage(image);
+                        Console.Clear();
+                        GUI.DrawPaintGUI(image.name, image.width, image.height, viewportWidth, viewportHeight);
+                        GUI.UpdatePaintGUI(currentForeColour, currentBackColour, currentShading);
+                        GUI.WriteCursorPosition(cursorX, cursorY);
+                        PicRender.DrawSubImage(image, 0, 3, viewportX, viewportY, viewportWidth, viewportHeight);
+                        break;
+                    case 67:
+                        //c - save a compressed image
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.Clear();
+                        Console.WriteLine("Compressing & Saving...");
+                        fileManager.SaveImageCompressed(image);
+                        Console.Clear();
+                        GUI.DrawPaintGUI(image.name, image.width, image.height, viewportWidth, viewportHeight);
+                        GUI.UpdatePaintGUI(currentForeColour, currentBackColour, currentShading);
+                        GUI.WriteCursorPosition(cursorX, cursorY);
+                        PicRender.DrawSubImage(image, 0, 3, viewportX, viewportY, viewportWidth, viewportHeight);
+                        break;
+                    case 70:
+                        //f - fill an area
+                        Fill(image, cursorX, cursorY, new Image.Pixel(currentForeColour, currentBackColour, currentShading));
+                        PicRender.DrawSubImage(image, 0, 3, viewportX, viewportY, viewportWidth, viewportHeight);
+                        break;
+                    case 81:
                         //q - quit
-					exitLoop = true;
-					break;
-				}
-			}
+                        exitLoop = true;
+                        break;
+                }
+            }
 
-		}
-	}
+        }
+
+        /// <summary>
+        /// A simple flood fill algorithm
+        /// </summary>
+        void Fill(Image image, int x, int y, Image.Pixel pixel)
+        {
+            int[,] comparisonMap = new int[image.width, image.height];  //Stores what pixels have been compared already (1) and which ones need to be compared (2)
+            comparisonMap[x, y] = 2;
+            Image.Pixel colourToReplace = image.data[x, y];
+
+            bool fillFinished = false;
+
+            while (!fillFinished) {
+                fillFinished = true;
+                for (int xPtr = 0; xPtr < image.width; xPtr++) {
+                    for (int yPtr = 0; yPtr < image.height; yPtr++) {
+                        if (comparisonMap[xPtr, yPtr] == 2) {
+                            fillFinished = false;
+                            image.data[xPtr, yPtr] = pixel; //Fill this pixel
+                            //Compare to the adjacent pixels
+                            if (xPtr < image.width - 1)
+                                if (image.data[xPtr + 1, yPtr] == colourToReplace && comparisonMap[xPtr + 1, yPtr] == 0)
+                                    comparisonMap[xPtr + 1, yPtr] = 2;
+                            if (xPtr > 0)
+                                if (image.data[xPtr - 1, yPtr] == colourToReplace && comparisonMap[xPtr - 1, yPtr] == 0)
+                                    comparisonMap[xPtr - 1, yPtr] = 2;
+                            if (yPtr < image.height - 1)
+                                if (image.data[xPtr, yPtr + 1] == colourToReplace && comparisonMap[xPtr, yPtr + 1] == 0)
+                                    comparisonMap[xPtr, yPtr + 1] = 2;
+                            if (yPtr > 0)
+                                if (image.data[xPtr, yPtr - 1] == colourToReplace && comparisonMap[xPtr, yPtr - 1] == 0)
+                                    comparisonMap[xPtr, yPtr - 1] = 2;
+                            comparisonMap[xPtr, yPtr] = 1;
+                        }
+                    }
+                }
+            }
+
+
+        }
+
+    }
 }
