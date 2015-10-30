@@ -19,6 +19,7 @@
 
 */
 using System;
+using AspicLibrary;
 
 namespace CLI_paint
 {
@@ -27,11 +28,13 @@ namespace CLI_paint
 
 		Rendering GUI;
 		FileManager fileManager;
+        AspicLibrary.Rendering PicRender;
 
 		public PaintProgram ()
 		{
 			GUI = new Rendering ();
 			fileManager = new FileManager ();
+            PicRender = new AspicLibrary.Rendering();
 		}
 
 		public void Run ()
@@ -131,7 +134,7 @@ namespace CLI_paint
 			GUI.DrawPaintGUI (image.name, image.width, image.height, viewportWidth, viewportHeight);
 			GUI.UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
 			GUI.WriteCursorPosition (cursorX, cursorY);
-            GUI.DrawSubImage(image, viewportX, viewportY, viewportWidth, viewportHeight);
+            PicRender.DrawSubImage(image, 0, 3, viewportX, viewportY, viewportWidth, viewportHeight);
 
 			while (!exitLoop) {
 
@@ -140,7 +143,7 @@ namespace CLI_paint
 					Console.Clear ();
 					GUI.DrawPaintGUI (image.name, image.width, image.height, viewportWidth, viewportHeight);
 					GUI.UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
-                    GUI.DrawSubImage(image, viewportX, viewportY, viewportWidth, viewportHeight);
+                    PicRender.DrawSubImage(image, 0, 3, viewportX, viewportY, viewportWidth, viewportHeight);
 
 					cScreenWidth = Console.WindowWidth;
 					cScreenHeight = Console.WindowHeight;
@@ -160,59 +163,59 @@ namespace CLI_paint
 				case 37:
                         //Left arrow
 					if (cursorX - 1 >= viewportX) {
-						GUI.DrawSinglePixel (image.data[cursorX, cursorY], cursorX - viewportX, cursorY - viewportY);
+						PicRender.DrawSinglePixel (image.data[cursorX, cursorY], cursorX - viewportX, cursorY - viewportY + 3);
 						cursorX--;
 					} else {
 						if (viewportX > 0) {
 							viewportX--;
 							cursorX--;
-                            GUI.DrawSubImage(image, viewportX, viewportY, viewportWidth, viewportHeight);
+                            PicRender.DrawSubImage(image, 0, 3, viewportX, viewportY, viewportWidth, viewportHeight);
 						}
 					}
 					break;
 				case 38:
                         //Up arrow
 					if (cursorY - 1 >= viewportY) {
-                        GUI.DrawSinglePixel(image.data[cursorX, cursorY], cursorX - viewportX, cursorY - viewportY);
+                        PicRender.DrawSinglePixel(image.data[cursorX, cursorY], cursorX - viewportX, cursorY - viewportY + 3);
 						cursorY--;
 					} else {
 						if (viewportY > 0) {
 							viewportY--;
 							cursorY--;
-                            GUI.DrawSubImage(image, viewportX, viewportY, viewportWidth, viewportHeight);
+                            PicRender.DrawSubImage(image, 0, 3, viewportX, viewportY, viewportWidth, viewportHeight);
 						}
 					}
 					break;
 				case 39:
                         //Right arrow
 					if (cursorX + 1 < viewportX + viewportWidth) {
-                        GUI.DrawSinglePixel(image.data[cursorX, cursorY], cursorX - viewportX, cursorY - viewportY);
+                        PicRender.DrawSinglePixel(image.data[cursorX, cursorY], cursorX - viewportX, cursorY - viewportY + 3);
 						cursorX++;
 					} else {
 						if (viewportX + viewportWidth < image.width) {
 							viewportX++;
 							cursorX++;
-                            GUI.DrawSubImage(image, viewportX, viewportY, viewportWidth, viewportHeight);
+                            PicRender.DrawSubImage(image, 0, 3, viewportX, viewportY, viewportWidth, viewportHeight);
 						}
 					}
 					break;
 				case 40:
                         //Down arrow
 					if (cursorY + 1 < viewportY + viewportHeight) {
-                        GUI.DrawSinglePixel(image.data[cursorX, cursorY], cursorX - viewportX, cursorY - viewportY);
+                        PicRender.DrawSinglePixel(image.data[cursorX, cursorY], cursorX - viewportX, cursorY - viewportY + 3);
 						cursorY++;
 					} else {
 						if (viewportY + viewportHeight < image.height) {
 							viewportY++;
 							cursorY++;
-                            GUI.DrawSubImage(image, viewportX, viewportY, viewportWidth, viewportHeight);
+                            PicRender.DrawSubImage(image, 0, 3, viewportX, viewportY, viewportWidth, viewportHeight);
 						}
 					}
 					break;
 				case 32:
                         //Space bar
                     image.data[cursorX, cursorY].SetPixel(currentForeColour, currentBackColour, currentShading);
-					GUI.DrawSinglePixel (image.data[cursorX, cursorY], cursorX - viewportX, cursorY - viewportY);
+                    PicRender.DrawSinglePixel(image.data[cursorX, cursorY], cursorX - viewportX, cursorY - viewportY + 3);
 					break;
 				case 49:
                         //1, decrease fcolor
@@ -258,7 +261,7 @@ namespace CLI_paint
 					GUI.DrawPaintGUI (image.name, image.width, image.height, viewportWidth, viewportHeight);
 					GUI.UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
 					GUI.WriteCursorPosition (cursorX, cursorY);
-                    GUI.DrawSubImage(image, viewportX, viewportY, viewportWidth, viewportHeight);
+                    PicRender.DrawSubImage(image, 0, 3, viewportX, viewportY, viewportWidth, viewportHeight);
 					break;
 				case 83:
 					//s - save the image
@@ -271,7 +274,7 @@ namespace CLI_paint
 					GUI.DrawPaintGUI (image.name, image.width, image.height, viewportWidth, viewportHeight);
 					GUI.UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
 					GUI.WriteCursorPosition (cursorX, cursorY);
-                    GUI.DrawSubImage(image, viewportX, viewportY, viewportWidth, viewportHeight);
+                    PicRender.DrawSubImage(image, 0, 3, viewportX, viewportY, viewportWidth, viewportHeight);
 					break;
                 case 67:
                     //c - save a compressed image
@@ -284,7 +287,7 @@ namespace CLI_paint
 					GUI.DrawPaintGUI (image.name, image.width, image.height, viewportWidth, viewportHeight);
 					GUI.UpdatePaintGUI (currentForeColour, currentBackColour, currentShading);
 					GUI.WriteCursorPosition (cursorX, cursorY);
-                    GUI.DrawSubImage(image, viewportX, viewportY, viewportWidth, viewportHeight);
+                    PicRender.DrawSubImage(image, 0, 3, viewportX, viewportY, viewportWidth, viewportHeight);
 					break;
 				case 81:
                         //q - quit

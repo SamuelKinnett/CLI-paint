@@ -70,6 +70,8 @@ namespace CLI_paint
 			Console.SetCursorPosition (0, 0);
 			Console.Write ("Editing " + name + ".aspic");
 
+            /* Currently disabled due to innacuracy and incompatibility with the compressed format.
+
 			//Calculate file size
 			float rawfilesize = (width.ToString ().Length + height.ToString ().Length + 2) * 8;   //The size of the header, 
 			//given by the number of digits in the width and height plus the dividers
@@ -88,6 +90,9 @@ namespace CLI_paint
 			//Draw file information
 			Console.SetCursorPosition (0, 1);
 			Console.Write (width + "x" + height + ", approx. file size: " + fileSize);
+
+            */
+
 
 			Console.SetCursorPosition (Console.WindowWidth - 18, 1);
 			Console.Write ("Foreground:");
@@ -195,84 +200,6 @@ namespace CLI_paint
 			Console.Write ("        ");  //Erase previous marker
 			Console.SetCursorPosition ((Console.WindowWidth - 18) + (currentShading - 1), 9);
 			Console.Write ("^");
-		}
-
-		/// <summary>
-		/// Draws the specified area of the original image
-		/// </summary>
-		public void DrawSubImage (Image imageToRender, int viewportX, int viewportY, int viewportWidth, int viewportHeight)
-		{
-			for (int y = 3; y < viewportHeight + 3; y++) {
-				Console.SetCursorPosition (0, y);
-				for (int x = 0; x < viewportWidth; x++) {
-                    //Get the current pixel's information
-                    int[] cPixel = imageToRender.data[x + viewportX, (y - 3) + viewportY].GetPixel();
-
-					Console.ForegroundColor = (ConsoleColor)cPixel[0];
-					Console.BackgroundColor = (ConsoleColor)cPixel[1];
-
-					switch (cPixel[2]) {
-					case 1:
-						Console.Write ("░");
-						break;
-					case 2:
-						Console.Write ("▒");
-						break;
-					case 3:
-						Console.Write ("▓");
-						break;
-					case 4:
-						Console.Write ("█");
-						break;
-					case 5:
-						Console.Write ("▄");
-						break;
-					case 6:
-						Console.Write ("▀");
-						break;
-					case 7:
-						Console.Write ("▌");
-						break;
-					case 8:
-						Console.Write ("▐");
-						break;
-					}
-				}
-			}
-		}
-
-		public void DrawSinglePixel (Image.Pixel pixelToDraw, int x, int y)
-		{
-			Console.SetCursorPosition (x, y + 3);    //Account for title bar
-			Console.ForegroundColor = (ConsoleColor)pixelToDraw.fc;
-			Console.BackgroundColor = (ConsoleColor)pixelToDraw.bc;
-
-			switch (pixelToDraw.s) {
-			case 1:
-				Console.Write ("░");
-				break;
-			case 2:
-				Console.Write ("▒");
-				break;
-			case 3:
-				Console.Write ("▓");
-				break;
-			case 4:
-				Console.Write ("█");
-				break;
-			case 5:
-				Console.Write ("▄");
-				break;
-			case 6:
-				Console.Write ("▀");
-				break;
-			case 7:
-				Console.Write ("▌");
-				break;
-			case 8:
-				Console.Write ("▐");
-				break;
-			}
 		}
 	}
 }
